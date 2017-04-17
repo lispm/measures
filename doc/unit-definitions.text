@@ -1,0 +1,370 @@
+Unit symbols are case sensitive.  The following are the units that are
+distributed with the Loom 4.0 release.  Each entry specifies the base
+unit for the measure, and the other units that are defined.  These units
+can be composed to form any arbitrary combination.
+
+The syntax for dimensioned numbers is to have the numeric value
+immediately followed by the units expression, with no intervening
+speaces.  Measurement units are delimited by exponents or the period
+symbol (".")	The division slash "/" may appear once in a unit
+specification.  As an example, the following are three alternate ways of
+specifying 12 square meters per second:
+
+	12m.m/s		12m2/s		12m2s-1
+
+SUMMARY OF MEASURES.  Base unit is the base unit for that measure.  Kind
+is either fundamental or derived.  Derived units have a definition in
+terms of other units.
+
+	Name				Base Unit	   Kind
+	=====================		=========	===========
+	DISTANCE-MEASURE 		   m 		Fundamental
+	AREA-MEASURE			   m2 		Derived
+	VOLUME-MEASURE			   m3 		Derived
+	TIME-MEASURE			   s  		Fundamental
+	SPEED-MEASURE			   m/s 		Derived
+	ACCELERATION-MEASURE		   m/s2 	Derived
+	ANGLE-MEASURE			   deg 		Derived
+	MASS-MEASURE			   kg 		Fundamental
+	FORCE-MEASURE			   N 		Derived
+	PRESSURE-MEASURE 		   Pa 		Derived
+	DENSITY-MEASURE 		   kg/m3 	Derived
+	POWER-MEASURE			   W 		Derived
+	WORK-OR-TORQUE-MEASURE 		   J 		Derived
+	REVOLUTION-MEASURE 		   deg/s 	Derived
+	FREQUENCY-MEASURE 		   Hz 		Derived
+	ELECTRIC-CURRENT-MEASURE	   A 		Fundamental
+	ELECTRIC-CHARGE-MEASURE 	   C 		Derived
+	ELECTRIC-POTENTIAL-MEASURE	   V 		Derived
+	ELECTRIC-RESISTANCE-MEASURE	   ohm 		Derived
+	CAPACITANCE-MEASURE 		   F 		Derived
+	INDUCTANCE-MEASURE 		   H 		Derived
+	MAGNETIC-FLUX-MEASURE 		   Wb 		Derived
+	MAGNETIC-FLUX-DENSITY-MEASURE	   T 		Derived
+	LUMINOUS-INTENSITY-MEASURE	   Cd 		Fundamental
+	ILLUMINANCE-MEASURE 		   lux 		Derived
+	DATA-MEASURE			   bit 		Fundamental
+	TEMPERATURE-MEASURE 		   K 		Fundamental
+	SCALAR-MEASURE					Fundamental
+
+
+FULL SPECIFICATION OF MEASURES.  This table lists the measures, their
+base units and definitions, and the units that have been defined for use
+by users.  The unit definitions will include the name and sometimes
+other notes about the units available.  The only areas where things get
+a little tricky is with the Data-measure and the Temperature-Measure.
+
+Although the system is largely base on the SI system of measures, we
+have added many non-SI units in order to make the package as useful as
+possible.  The choice of non-SI units does have a strong U.S. bias.
+
+DISTANCE-MEASURE base unit: m   (Meter)
+  units:  nm		(nanometer)
+	  um		(micrometer)
+	  mm		(millimeter)
+	  cm		(centimeter)
+	  dm		(decimeter)
+	  km		(kilometer)
+	  angstrom
+	  ang		(angstrom)
+	  in		(inch, international)	Standard U.S. measure
+	  ft		(foot, international)	Standard U.S. measure
+	  yd		(yard, international)	Standard U.S. measure
+	  mile		(mile, international	Standard U.S. measure
+	  miles		(mile)
+	  mi		(mil)
+	  NM		(nautical mile)		lower case already taken
+	  nautmi	(nautical mile)
+	  fathom	
+	  furlong
+	  pica		(pica)			 computer, not printer's
+	  point		(point)			 computer, not printer's
+	  pt		(point)
+	  AU		(Astronomical Unit)
+	  lightyear				 Derived from year and c
+	  LY		(light year)
+	  parsec	
+
+AREA-MEASURE base unit: m2   (Square Meter)
+  :units (mm2 cm2 km2				Obvious derivations
+	  in2 yd2 ft2 mile2 NM2
+
+	  sqyd		(square yard)
+          sqft		(square foot)
+	  sqin		(square inch)
+          sqkm		(square kilometer)
+          sqmile	(square mile)
+
+          hectare
+          ha		(hectare)
+          are		
+	  a		(are)
+          acre
+
+VOLUME-MEASURE base unit: m3	(Cubic meter)
+  :units  liter
+	  l		(liter)
+          ml		(millileter)
+          cc		(cubic centimeter)
+          cl		(centiliter)
+          dl		(deciliter)
+          Hl		(hektoliter)
+          cuft		(cubic foot)
+	  cuyd		(cubic yard)
+
+	  mm3 cm3 km3				Obvious derivations
+	  in3 ft3 yd3 mile3 NM3
+
+          acrefeet	(acre foot)
+	  gallon	(gallon, U.S.)		Not Imperial
+          pint		(pint, U.S.)		Not Imperial
+          quart		(quart, U.S.)		Not Imperial
+	  gal		(gallon, U.S.)		Not Imperial
+	  qt		(quart, U.S.)		Not Imperial
+	  floz		(fluid ounce)
+	  cup		(cup)
+	  tbl		(tablespoon)
+	  tsp		(teaspoon)
+          barrel	(barrel, petroleum)
+          bbl		(barral)
+          Mbbl		(million barrels)	10^6
+          Bbbl		(billion barrels)	10^9, U.S. billion
+          BRT           (Brutto register ton)	Register ton
+
+TIME-MEASURE base unit: s    (second)
+  :units  ns		(nanosecond)
+	  us		(microsecond)
+	  ms		(millisecond)
+	  min		(minute)		"m" is taken for meter
+	  h		(hour)
+	  hr		(hour)
+	  day		(day)
+          days
+	  week		(week)
+	  weeks
+	  fortnight
+	  year		(mean tropical year)	365.24219 days
+	  years
+	  decade
+	  century
+
+SPEED-MEASURE base unit: m/s   (meters per second)
+  :units  km/h 
+          mph
+          kts
+	  ft/s 
+          knots
+	  c	; Speed of Light  ; NIST, MfM
+
+ACCELERATION-MEASURE base unit: m/s2   (meters per second squared)
+  :units  G		(Gee)		acceleration due to 1 gravity
+					This permits use of standard
+				        gravitational acceleration as if
+					it were a unit.
+	  ft/s2		(feet per second squared)
+
+ANGLE-MEASURE base unit: deg	(degree)
+  :units  rad		(radian)
+          minute	(minute of arc)
+          sec		(second of arc)
+          mil		(mil of angle)	  There are 6400 mils in a circle
+
+  Notes:  The Angle-Measure uses degrees as the fundamental unit rather
+          than the SI standard of radians.  This was done to make
+          conversions between degrees and minutes and seconds exact,
+          since the conversion between radians and degrees involves the
+          use of the irrational number PI.
+
+
+MASS-MEASURE base unit: kg   (kilogram)
+  :units  g		(gram)
+	  mg		(milligram)
+	  ug		(microgram)
+          lbs		(pounds, avoidupois)
+          lb		(pounds, avoidupois)
+          oz		(ounces, avoidupois)
+	  gr		(grain)
+          mton		(metric ton)
+          tonne		(metric ton)
+          tonshort	(ton, U.S. short)	2000 lbs
+	  longton	(ton, U.S. long)	2240
+          stone		(stone)
+          hwt		(hundredweight)
+          slug		(slug)
+          carat		(carat)			Jewelers
+
+FORCE-MEASURE base unit: N  (Newton)  Definition:   kg.m/s2
+  :units  g.m/s2
+	  kN		(kilonewton)
+	  kgf		(kilogram of force)
+	  lbf		(pound of force)
+          dyne		(dyne)
+
+PRESSURE-MEASURE base unit: Pa  (Pascal)   Definition: kg/s2m
+  :units  g/s2m
+	  N/m2		(Newton per square meter)
+	  hPa		(hectopascal)
+          kPa		(kilopascal)
+	  atm		(atmosphere)		Normal sea level air pressure
+          inHg		(inches of mercury)
+	  torr		(torr)
+          mmHg		(millimeters of mercury)
+          psi		(pounds per square inch)
+	  bar		(bar)
+          mbar		(millibar)
+
+
+DENSITY-MEASURE base unit: kg/m3	(kilograms per cubic meter)
+  :units  g/m3		(grams per cubic meter)
+	  g/cm3		(grams per cubic centimeter)
+          lbs/in3	(pounds per cubic inch)
+
+POWER-MEASURE base unit: W  (Watt)   Definition:   m2kg/s3
+  :units  N.m/s		(Newton-meter per second)
+	  mW		(milliwatt)
+          kW		(kilowatt)
+          MW		(megawatt)
+          GW		(gigawatt)
+	  hp		(horsepower)
+	  shp		(shaft horsepower)
+
+
+WORK-OR-TORQUE-MEASURE base unit: J  (Joule)  Definition: m2kg/s2
+  :units  N.m		(Newton-meter)		Preferred unit for torque
+	  ft.lbf	(foot-pound)		Note: pound-force, not mass
+	  in.lbf	(inch-pount)		Note: pound-force, not mass
+	  kJ		(kilojoule)
+	  MJ		(megajoule)
+	  GJ		(gigajoule)
+          BTU		(British Thermal Unit, international)
+          cal		(calorie, international)
+          kcal		(kilocalorie)
+	  therm		(therm)			EC definition, not US
+	  kWh		(kilowatt-hour)
+          
+  Notes:  Torque has the same units as work, so we cannot distinguish
+          between them
+	  BTU and calorie have several different values.  We have chosen
+          to use the international BTU and calorie.
+
+
+REVOLUTION-MEASURE base unit: deg/s   (degrees per second)
+  :units  rps		(revolutions per second)	360deg/sec
+          rpm		(revolutions per minute)	360deg/min
+
+FREQUENCY-MEASURE base unit: Hz   (Hertz)   Definition:  s-1
+  :units  kHz		(kilohertz)
+	  MHz		(megahertz)
+	  GHz		(gigahertz)
+
+
+ELECTRIC-CURRENT-MEASURE base unit: A   (Ampere)
+  :units mA		(milliampere, milliamp)
+
+ELECTRIC-CHARGE-MEASURE base unit: C  (Coulomb)  Definition: s.A
+  :units pC		(picocoulomb)
+
+ELECTRIC-POTENTIAL-MEASURE base unit: V (Volt)   Definition: m2kg/s3A =  W/A
+  :units  mV		(millivolt)
+	  kV		(kilovolt)
+	  MV		(megavolt)
+
+ELECTRIC-RESISTANCE-MEASURE base unit: ohm  (Ohm) Definition:  m2kg/s3A2 = V/A
+  :units  kohm		(kiloohm)
+	  Mohm		(megaohm)
+
+CAPACITANCE-MEASURE base unit: F   (Farad)   Definition: A2s4/m2kg = C/V
+  :units  mF		(millifarad)
+	  uF		(microfarad)
+	  pF		(picofarad)
+
+INDUCTANCE-MEASURE base unit: H  (Henry)   Definition:  m2kg/A2s2 = Wb/A
+
+
+MAGNETIC-FLUX-MEASURE base unit: Wb  (Weber)  Definition:  m2kg/s2A = V.s
+
+
+MAGNETIC-FLUX-DENSITY-MEASURE base unit: T  (Tesla) Definition:  kg/s2A = Wb/m2
+
+
+LUMINOUS-INTENSITY-MEASURE base unit: Cd  (Candela)
+  :units lumen		(lumen)
+	 lm		(lumen)
+          
+  Notes: Also includes luminous flux, which has the same reduced units.
+
+ILLUMINANCE-MEASURE base unit: lux	Definition:   Cd/m2
+  :units lx		(lux)
+
+DATA-MEASURE base unit: bit	(one bit)
+  :units  byte		(byte)		8 bits
+          
+     BASE 2 Multiples:
+          kibit		(kibibit)	2^10 bits
+          Kibit		(kibibit)	
+	  Mibit		(mibibit)	2^20 bits
+	  KiB		(kibibyte)	2^10 bytes
+	  kiB		(kibibyte)
+	  MiB		(mebibyte)	2^20 bytes
+	  GiB		(gibibyte)	2^30 bytes
+	  TiB		(tebibyte)	2^40 bytes
+          
+     BASE 10 Multiples:
+	  kbit		(kilobit)	10^3 bits
+	  Mbit		(megabit)	10^6 bits
+	  kB		(kilobyte)	10^3 bytes
+	  MB		(megabyte)	10^6 bytes
+	  GB		(gigabyte)	10^9 bytes
+	  TB		(terabyte)	10^12 bytes
+          
+   Note:  The standard metri prefixes should only be used for multiples
+          of 10.  For binary multiples, other related prefixes need to
+          be used.  We use the prefixes for binary multiples that have
+          been adopted by the International Electrotechnical Commission
+          for use in information technology.  See
+		http://physics.nist.gov/cuu/Units/binary.html
+
+
+TEMPERATURE-MEASURE base unit: K   (degree kelvin)
+  :units  F	(degree Fahrenheit)
+	  C	(degree Celsius)	or Centigrade
+	  R	(degree Rankine)	Fahrenheit counterpart to Kelvin
+
+   Note:  The temperature measure differs from all the others in that it
+          is linked to a scale with different zero points for various
+          measures.  That means that this measure can only be used for
+          describing the absolute temperature of items.  It cannot
+          correctly be used in computations other than unit conversions
+          since it is tied to this outside scale.
+	In other words, don't add or subtract temperatures!
+
+
+SCALAR-MEASURE 
+  :units %	(percent)		1/100
+         %%	(promille)		1/1000
+
+   Note:  All numbers without units belong to the scalar measure, even if
+          not specifically enumerated.  This measure class is used to
+          allow the reader mechanism to support things like percent and
+          promille.
+
+
+
+
+
+
+===============================================================================
+
+References:
+
+  Guide for the Use of the International System of Units (SI)
+  U.S. Department of Commerce
+  National Institute of Standards and Technology (NIST)
+  NIST Special Publication 811, 1995 Edition
+  http://physics.nist.gov/Document/sp811.pdf
+
+  Richard A. Young and Thomas J. Glover
+  Measure for Measure
+  1996.  ISBN 1-889796-00-X
+  (Blue Willow, Inc.; Littleton, Colorado, USA)
+  http://www.bluewillow.com

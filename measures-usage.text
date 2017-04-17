@@ -1,0 +1,439 @@
+The MEASURES-Package
+====================
+
+originally written by Roman Cunis, Hamburg, Germany
+
+The Measures Package provides dimensioned numbers (i.e.  numbers with
+dimensional units, short: dim-numbers) for Common Lisp.  Calculations
+can be done with dim-numbers in the same way as with normal numbers, e.g.:
+
+    (dim+ 12m 34cm) -> 12.34m
+    (dim* 3m 3m)    -> 9qm
+
+The documentation is structured as follows:
+
+1. Notation for units of measurements and dim-numbers.
+2. Definition of units of measurement and relations between units.
+3. Input support of dim-numbers.
+4. Operations on dim-numbers.
+5. Output formats for defined units.
+6. Miscellaneous features
+
+All definitions are contained in the package 'measures' (nickname is 'ms').
+The code runs as well under plain Common Lisp. 
+
+
+1. Notation for Units of Measurement and Dim-Numbers
+----------------------------------------------------
+
+A simple unit of measurement is written as a sequence of alphabetic chars
+where case is significant: e.g. m (meter), s (second), ms (millisecond), 
+mph (miles per hour). (Special characters of your character set might
+additionally be declared using define-unit-char (see Section 6), #\$ is
+already predefined.)
+
+More complex units of measurement can be written as multiplicative expressions
+of simple units. In general, an expression
+
+         2  3
+        a  b
+       -------  , where a,b,c,d are some units, 2,3 may be any positive
+         2  3     exponents,
+        c  d
+
+is written as "a2b3/c2d3". An exponent of 1 can be written as 1, can be
+substituted by '.' between units and may be omitted at the end of nominator or
+denominator in a unit expression. Thus, the following are equivalent:
+  "m1s2" == "m.s2" == "s2m"
+
+Valid unit expressions are e.g.: "m2" (square meter), "km/h" (kilometer per
+hour), "kg.m/s2" (kilogram meter per square second, i.e. 1 Newton).
+
+Unit expressions constructed from defined simple units may be used for input
+of dim-numbers and will be automatically be generated for output of results:
+E.g.
+   (dim* 9m 5m2) ==> 45m3
+is valid even if only "m" is defined and "m2", "m3" have never been declared
+explicitly.
+
+[NOTE: As clearly to be seen, unit handling and conversion is done by
+multiplicative means. Therefore, conversions that need a constant offset are
+not supported: e.g. F(ahrenheit) can NOT be expressed in terms of C(elsius) or
+vice versa.]
+
+Dim-numbers consist of a number (any valid number representation is allowed)
+immediately followed by a unit expression, e.g.:
+  5m  -5.3s  3/2m.s  3.5e-2ms
+
+[Note, that the single letter "e" must never be defined as unit in order to
+allow exponential notation for input.]
+
+
+2. Definition of Units of Measurement
+-------------------------------------
+
+Each measurement, e.g. distance, area, time, etc., requires the definition of a
+*base unit*. Scaled units can be defined relative to base units.
+Measurements can be derived from other measurements, e.g. area from distance. 
+Those relationships will be taken into account when calculating with
+dim-numbers. Non-derived measurements are called *primitive* measurements.
+
+The definition of units of measurement is done by means of the macro
+defmeasure:
+
+  (defmeasure <measurement>
+              <base-unit> | (<base-unit unit-expr>)
+              :units ( <unit-definition>* [:metric | :scientific] )
+              :format <format-spec>
+  )
+
+<measurement> is the name of the measurement, e.g. distance, area, time.
+<base-unit> is the base-unit defined for that measure, e.g. "m" for distance,
+"s" for time. Derived measurements may be defined using the corresponding
+unit-expression, e.g. "m2" for area. If the base-unit for a derived
+measurement requires a spelling different from the corresponding
+unit-expression, a base-unit definition might be given as association of a
+unit-string with a unit-expression, e.g. ("mps" "m/s") for speed, ("qm" "m2")
+for area. [Note however, that *only* base-units may be used in the definition
+if new base-units. E.g. "mph" cannot be given as base-unit for speed if "m"
+and "s" are base-units for distance and time.]
+
+Relative units to the base-units are given as a list of <unit-definitions>
+following :units. A <unit-definition> is either a unit-expression consisting
+of known units, or a list beginning with a new simple unit-string, followed by
+scaling factors and unit-expressions: (<new-unit> <factor>* <unit-expr>+).
+E.g.: ("cm" 1/100 "m")  ("min" 60 "s")
+
+[Note however, that dim-numbers may not be used in the definition of units:
+WRONG: ("min" "60s").]
+
+If a whole range of metric units is required for a measurement, exactly one
+of the keywords :scientific or :metric can be given within the unit-definition
+list:
+    :scientific generates the prefixes 
+                "p-" (pico-, 10e-12), "n-" (nano-, 10e-9),
+                "u-" (micro-, 10e-6, "u" is used for lack of the greek letter
+                mu), 
+                "m-" (milli-, 10e-3), "k-" (kilo-, 10e3), "M-" (Mega-, 10e6),
+                "G-" (Giga-, 10e9). 
+                E.g.: 
+                (defmeasure capacity "F" :units (:scientific)) would generate
+                "pF", "nF", "uF", "mF", "F", "kF", "MF", "GF".
+    :metric generates commonly used European prefixes: 
+                "m-" (milli, 1/1000), "c-" (centi-, 1/100), 
+                "d-" (deci-, 1/10), "k-" (kilo-, 1000). 
+                E.g.: 
+                (defmeasure distance "m" :units :metric) generates 
+                "mm", "cm", "dm", "m", "km".
+[Note, that if only :scientific or :metric is given to :units, the symbol may
+replace the list.]
+
+<format-spec> specifies an optional permanent output format for the
+measurement; for details see section 5.
+
+All unit-strings or unit-expressions can be given either as strings or as
+symbols (remember to use the vertical-bar notation in order to preserve case),
+e.g. "m" == |m|. All units are internally stored as symbols containing a
+reference to its measurement on its property-list. Strings will be
+internalized in the current package. Take care not to switch packages between
+the definition and use of units (or else explicitly export unit symbols).
+
+Some complete examples:
+
+(defmeasure distance "m"
+            :units (:metric ("in" 0.0254 "m") ("ft" 12 "in") (|yd| 3 |ft|)) )
+
+(defmeasure area "m2"
+            :units (("sqyd" "yd" "yd") ("acre" 4840 |sqyd|)) )
+
+(defmeasure time "s" :units (("min" 60 "s") ("h" 60 "min") ("day" 24 "h")) )
+
+(defmeasure speed "m/s" :units ("km/h" ("mph" 1.6 "km/h")) )
+
+
+For every defined measurement a description object is generated (an
+instance of class 'measure'). This object
+contains all relevant information about a measure. The function pprint-measure
+(see section 6) can be used to show this information. 
+E.g.: (pprint-measure 'distance) =>
+{{<Measure DISTANCE>
+     Base-Unit: |m|
+     Scale: ((|km| . 1000) (\m . 1) (|yd| . 1143/1250) (|ft| . 381/1250) 
+             (|dm| . 1/10) (|in| . 127/5000) (|cm| . 1/100) (|mm| . 1/1000))
+     Prim-Id: 2
+     Output-Format:  }}
+
+
+3. Input of Dim-Numbers
+-----------------------
+
+Intuitively one would want to input dim-numbers just like any other number
+within the listener or in response to read-functions. In order to achieve
+this, a read-macro can be set up so that all tokens beginning with a digit or
+as sign (#\+, #\-) are first scanned whether they represent a dim-number. If
+this is the case, the appropriate dim-number object is created, otherwise the
+normal reading process continues, thus resulting in a normal number
+representation or a symbol if no conversion is possible.
+
+This read-macro must explicitly be set up in your environment by calling
+     (install-dim-number-reader :permanent t)
+
+[Alternatively you might set your *readtable* to the package's internal
+ms::*dim-number-readtable* to temporarily activate the read-macro.]
+
+If you want to have a read-macro but want to avoid overloading common
+characters like digits, you might specify a dispatch-macro character instead:
+     (install-dim-number-reader :dispatch #\M)
+enables input of dim-numbers in the form #M12.3m .
+
+Explicit control about dim-number parsing is provided by the functions
+  -   read-dim-number &optional (stream *standard-input*)
+  -   parse-dim-number string &key (:start 0) (:end (length string))
+
+read-dim-number reads a dim-number from stream analogously to read.
+parse-dim-number parses a dim-number from a string (analogously to
+read-from-string). Both functions return the dim-number read, or else whatever
+read or read-from-string would have returned. parse-dim-number returns the
+index of the first char after the parsed dim-number as second value.
+
+If necessary, the function dim-number may be used to explicitly create a
+dim-number from a given value and unit:
+     dim-number <value> <unit>
+
+Both arguments are evaluated. <unit> may be given as either symbol or string.
+E.g.: (dim-number 3.2 '|m|) => 3.2m
+
+
+4. Operations on Dim-Numbers
+----------------------------
+
+A whole suite of numerical operations is provided for dim-numbers. Note, that
+all operations can handle normal numbers as well.
+
+dim-value <dim-number> &optional <unit>
+returns the value part of a dim-number. Without <unit> this value corresponds
+to the measurement's base-unit (this is the value with which the dim-number is
+internally represented). If <unit> is given, the value will be converted
+accordingly. Both arguments are evaluated. <unit> may be given as either
+symbol or string. 
+E.g.: (dim-value 123mm) => 0.123 , (dim-value 123mm "cm") => 12.3
+[If <dim-number> is a normal number, dim-value returns that number.]
+
+dim+, dim-, dim-max, dim-min 
+are defined analogously to +, -, max, min, resp. All require, that all
+operands have compatible units. Otherwise an error is signalled. (If you can
+guarantee that all dim-number operands are compatible, you might use sdim+,
+sdim-, sdim-max, sdim-min ('s-' for 'safe') instead that do not perform the
+compatibility check.)
+
+dim*, dim/
+are defined analogously to *, /. Dim-numbers and normal operands are both
+allowed as operands. These functions return dim-numbers as a result unless the
+units are factored out in the course of the operation. In this case the
+appropriate number is returned. E.g.: (dim/ 6m 300mm) => 20
+
+dim-expt, dim-sqrt are defined analogously to expt, sqrt. Note that dim-sqrt
+and dim-expt with a negative power will return an error, if the unit of the
+operand cannot be reduced appropriately:
+E.g. (dim-sqrt 9m2) => 3m ;  (dim-sqrt 10s) => ERROR!
+
+dim=, dim/=, dim<, dim<=, dim>, dim>=
+are defined analogously to the common comparison operators. All require, that
+all operands have compatible units. Otherwise an error is signalled. (If you
+can guarantee that all dim-number operands are compatible, you might use
+sdim=, sdim/=, etc. ('s-' for 'safe') instead that do not perform
+the compatibility check.)
+
+dim-zerop
+returns T for all 0 values independent of unit. It will return T for the
+number 0 as well.
+
+
+5. Output Formatting for Dim-Numbers
+------------------------------------
+
+Dim-numbers are internally stored as structs of type dim-number. The
+print-function of these structs is set so that output is formatted correctly.
+(Normally this is completely transparent to the user. However, if for some
+reasons output formatting should be suppressed, the internal global variable
+ms::*print-formatted-dim* may be set to NIL.)
+
+Output formatting can be controlled for each measurement individually. Thus
+you may control which unit of measurement is used for a dim-number of a
+certain measurement. There are five output modes available:
+     :base  -- always use the base-unit.
+     :current  -- use the unit with which the dim-number has been input or
+                  generated. If this cannot be determined (e.g. after numerical
+                  operations) use the base-unit. (This is the default for all
+                  measurements.)
+     :unit <unit>  -- use the specified unit.
+     :best-fit  -- use that unit that requires the minimum number of digits
+                  before the decimal point, or the minimum number of zeroes
+                  after it (see example below).
+     :step <unit-1> ... <unit-n>  -- stepwise decomposition into integer
+                  values according to the specified units.
+
+All output formats may optionally be followed by a single positive integer
+that --if applicable-- controls the output precision for float values.
+
+The following examples illustrate all formats for "17.42h" (hours):
+    :current              17.42h
+    :current 1            17.4h
+    :base                 62712s
+    :best-fit             0.726days
+    :best-fit 2           0.73days
+    :step "h" "min" "s"   17h:25min:12s 
+
+[NOTE that the output format for :step can NOT be used for input!]
+
+Here is a detailed example for :best-fit : Using :best-fit for 'distance'
+the following values will be printed as shown in the right column:
+    0.0001m  ->  0.1mm
+    0.001m   ->  1mm
+    0.01m    ->  1cm
+    0.1m     ->  0.1m
+    1m       ->  1m
+    10m      ->  10m
+    100m     ->  0.1km
+    1000m    ->  1km
+
+In determining the best fit for :best-fit, all defined units of a measurement
+are taken into account. This might result in unexpected choices if non-metric
+units are present (like "in" or "ft"). In order to exclude such units, specify
+all *admissible* units explicitly with :best-fit, 
+e.g. :best-fit "mm" "cm" "m" "km".
+
+For the :step-format, the global variables *step-skip-leading-zeros* and
+*step-skip-trailing-zeros* control whether leading or trailing units, resp.,
+will be shown if their value is 0. Both variables are initially set to T. 
+E.g. with (:step "days" "h" "min" "s"), "75min" are by default printed as
+"1h:15min". This would become "0days:1h:15min:0s" if both variables were NIL.
+
+All macros and functions that control output formatting accept a format
+description list. A single keyword symbol is sufficient, if the list would
+contain only one element.
+
+The output format can be permanently specified for a given measurement using
+the :format parameter of defmeasure. E.g.:
+    (defmeasure distance "m" :units ... :format (:current 3))
+
+The format may be permanently changed by setf-ing the access function
+ms-output-format of a measure object. E.g.:
+    (setf (ms-output-format (measure-named "distance"))
+          '(:best-fit "mm" "m" "km"))
+
+The format may be temporarily changed for one or more measures using the macro
+with-unit-format:
+    (with-unit-format (([<measure>] <format-spec>) ...)
+       ...
+    )
+E.g.:
+    (with-unit-format ((distance :base) (time :step "h" "min" "s" 2)) 
+       ...
+    )
+
+If only one format is given, the outermost brackets may be omitted. If no
+<measure> is given, the specified format applies to *all* measures. E.g.
+    (with-unit-format (:base) ...)
+is the suggested environment for printing values to a file in order to
+guarantee re-readability. (Remember that the :step-format would not be
+readable!)
+
+A single dim-number may be printed with a specified format using the macro
+print-converted.
+    print-converted <dim-number> &rest <format-desc>
+Only the <dim-number> is evaluated. E.g.:
+    (print-converted 17.24h :unit "min" 2)
+
+
+6. Miscellaneous Functions
+--------------------------
+
+Here is a set of additional functions supporting the handling of measure
+objects and dim-numbers. 
+
+dim-number-p <dim-number>
+returns T if <dim-number> is an object of type dim-number (or a subtype
+thereof).
+
+dim-measure <dim-number>
+returns the measure object corresponding to <dim-number>.
+
+measuring-p <dim-number> <measure>
+returns T if <dim-number> belongs to <measure> (given as object or symbol).
+
+measure-p <obj>
+tests whether <obj> is a measurement description object.
+
+measure-named <name>
+returns --if present-- the measure object for the measurement named <name>
+(given as symbol). Otherwise it returns NIL.
+
+ms-base-unit, ms-scale,  ms-name
+access attributes of measure objects. None of these should be
+used for modification.
+
+ms-output-format <measure>
+accesses the permanent output format of a measure object. With setf it may be
+used to change the permanent output format (see section 5).
+
+pprint-measure <measure>
+pretty-prints the information contained in a measurement description object as
+shown in section 2. <measure> may either be a measure object or the name of
+one (given as symbol).
+
+delete-measure <measure>
+deletes a measure object (given as object or name symbol) and all units
+defined for it. Moreover, if <measure> is primitive, all derived measures will
+ALSO be deleted! (E.g. deleting 'distance' would in turn delete 'area' and
+'speed', too.) As this is a potentially desastrous operation (if there are
+still dim-numbers for those measures around), y-or-n-queries will be output in
+order to confirm the deletion.
+
+delete-unit <unit>
+deletes <unit> (given as string or symbol) from its measurement. However, if
+<unit> names a base-unit, the corresponding measurement is deleted as with
+delete-measure.
+
+get-derived-measures <measure>
+returns a list of all measure objects that are derived from <measure> (given
+as measure object). E.g.:
+  (get-derived-measures (measure-named 'distance)) =>
+     ( #<Measure AREA>  #<Measure SPEED> )
+
+declare-unit-char <char>
+declares <char> to be a valid constituent of simple unit strings (see section
+1). This allows the use of special characters, e.g. greek characters as mu or
+delta, or special currency symbols (e.g. Cent, Pound Sterling, Yen), to be
+used as or included in units.
+
+*measures-version*
+is a global variable containing version information about the measures
+package.
+
+
+A. Appendix
+-----------
+
+Two enhancements are of great use for the measurement package.
+
+The first feature to be used is
+  (setf (readtable-case <some-readtable>) :preserve)
+This allows the dim-number-reader to use the normal token reading features of
+Common Lisp, even where case should be preserved. This is more efficient than
+the technique of reading a token character by character.
+
+The second feature is concerned with storing and loading of dim-numbers. The
+normal storage mechanisms of Common Lisp would store a struct with all its
+attributes. Dim-numbers will thus be stored with their value and their
+internal measurement id (prim-id). As prim-ids are assigned to measure objects
+dynamically dependent on the sequence of declaration, re-reading dim-numbers
+from file will only work, if all measurements have been assigned the same
+prim-ids as when stored.
+
+However, Common Lisp provides the possibility of specifying a load-form for
+objects of a specific type. The measures package defines
+such a load-form for dim-numbers so that dim-numbers will be stored with their
+value and the unit-symbol of their base-unit. This will allow stable
+re-loading independent of internally assigned prim-ids.
+
