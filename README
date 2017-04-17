@@ -1,28 +1,47 @@
-The Measures Package provides dimensioned numbers (i.e.  numbers with
+The Measures Package provides dimensioned numbers (i.e. numbers with
 dimensional units, short: dim-numbers) for Common Lisp.
+
+Contact: Rainer Joswig, joswig@lisp.de
 
 The software was originally written by Roman Cunis, Hamburg, Germany and then
 maintained by Ralf Möller.
 See: http://www.cs.cmu.edu/Groups/AI/util/lang/lisp/code/syntax/measures/0.html
 
-This version is taken from LOOM, which has defined various extensions
-and a lot of dimensional units. See: http://www.isi.edu/isd/LOOM/
+This version is taken from LOOM, which has various extensions
+and defines many dimensional units. See: http://www.isi.edu/isd/LOOM/
+
 See the LOOM Public License:
 http://www.isi.edu/isd/LOOM/loom-public-license.html
 
-This product includes software developed by and/or derived from
-the LOOM Project (http://www.isi.edu/isd/LOOM/LOOM-HOME.html) to
-which the U.S. Government retains certain rights.
+  This product includes software developed by and/or derived from
+  the LOOM Project (http://www.isi.edu/isd/LOOM/LOOM-HOME.html) to
+  which the U.S. Government retains certain rights.
 
-Rainer Joswig (2017) removed some support for older versions of Common Lisp,
-fixed some problems and updated the system definition.
+Rainer Joswig (joswig@lisp.de , 2017) removed some support for older versions
+of Common Lisp, fixed some problems and updated the system definition.
 
 System declarations for ASDF and LispWorks are provided.
 
-The software still uses a logical pathname "MEASURES". It is setup
+The software still uses a logical pathname "MEASURES". It is set up
 by loading the file "measures-sysdcl.lisp".
 
 This version assumes a variant of ANSI Common Lisp.
 
+Load in LispWorks:
 
+(load "measures-sysdcl.lisp")
+(compile-system :measures :load t)
+
+Load in Clozure CL:
+
+(require "ASDF")
+(load "measures-sysdcl.lisp")
+(asdf:compile-system "Measures")
+(asdf:load-system "Measures")
+
+
+Use:
+
+CL-USER 2 > (ms:dim* #M10kg #M10min)
+#M6000kg.s
 
