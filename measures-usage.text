@@ -322,6 +322,9 @@ ms-output-format of a measure object. E.g.:
     (setf (ms-output-format (measure-named "distance"))
           '(:best-fit "mm" "m" "km"))
 
+RJ: above is outdated. change the format with
+    (ms:define-unit-format ms:distance :best-fit "mm" "m" "km")
+
 The format may be temporarily changed for one or more measures using the macro
 with-unit-format:
     (with-unit-format (([<measure>] <format-spec>) ...)
