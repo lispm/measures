@@ -26,15 +26,17 @@
 (defsystem :measures
     (:default-pathname "measures:source;")
   (:serial "package"
-           "measures" 
-           "reader-setup"))
+           "measures"
+           "measure-enhancements"
+           "reader-setup"
+           "unit-defs"))
 
 #+:LispWorks
 (defsystem :measures
   (:default-pathname "MEASURES:SOURCE;"
    :object-pathname  "MEASURES:BIN;"
    :default-type :lisp-file
-   :optimize ((speed 3)
+   :optimize ((speed 2)
               (space 2) 
               (safety 3)
               (debug 2)))
@@ -55,9 +57,11 @@
   (:serial
     "package"
     "measures"
+    "measure-enhancements"
     "symbolics-patch-1"
     "symbolics-patch-2"
-    "reader-setup"))
+    "reader-setup"
+    "unit-defs"))
 
 #+(and asdf (not (or lispworks allegro genera)))
 (asdf:defsystem "Measures"
